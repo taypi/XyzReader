@@ -242,11 +242,6 @@ public class ArticleDetailFragment extends Fragment implements
                         }
                     });
         }
-//        else {
-//            mRootView.setVisibility(View.GONE);
-//            titleView.setText("N/A");
-//            bylineView.setText("N/A" );
-//        }
     }
 
     @Override
@@ -269,7 +264,6 @@ public class ArticleDetailFragment extends Fragment implements
             Toast.makeText(getActivity(), getString(R.string.error), Toast.LENGTH_LONG).show();
             mCursor.close();
             mCursor = null;
-//            startActivity(new Intent(getActivity(), ArticleListActivity.class));
         }
 
         bindViews();
