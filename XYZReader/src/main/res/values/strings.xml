@@ -9,4 +9,6 @@
 
     <string name="up">Up</string>
 
+    <string name="error">Error reading item detail</string>
+
 </resources>

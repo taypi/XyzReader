@@ -1,102 +1,98 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/meta_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="@dimen/appbar_height"
+        android:elevation="@dimen/toolbar_elevation"
+        android:background="@color/theme_primary">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/photo_container"
+            android:id="@+id/ctb_detail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
+            android:layout_height="match_parent"
+            app:expandedTitleGravity="top"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/logo"
-                    android:contentDescription="@string/app_name"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    android:background="@color/photo_placeholder"
+                    android:scaleType="centerCrop" />
 
-                <TextView
-                    android:id="@+id/article_title"
-                    style="?android:attr/textAppearanceLarge"
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/photo_background_protection"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
-                    android:fontFamily="sans-serif-condensed"
-                    android:textColor="#fff"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/detail_title_text_size"
-                    android:lineSpacingMultiplier="0.9"
-                    app:layout_constraintBottom_toTopOf="@id/article_byline"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    android:layout_gravity="bottom"
+                    android:paddingBottom="@dimen/detail_metabar_vert_padding"
+                    android:paddingLeft="@dimen/detail_inner_horiz_margin"
+                    android:paddingRight="@dimen/detail_inner_horiz_margin"
+                    android:paddingTop="@dimen/detail_metabar_vert_padding">
 
-                <TextView
-                    android:id="@+id/article_byline"
-                    style="?android:attr/textAppearanceSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#8fff"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    <TextView
+                        android:id="@+id/article_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="0.9"
+                        android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/detail_title_text_size"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/article_byline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorLight"
+                        app:layout_constraintTop_toBottomOf="@id/article_title"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="@dimen/toolbar_height"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="@dimen/list_toolbar_side_margin"
+                android:layout_marginRight="@dimen/list_toolbar_side_margin" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
-    <androidx.core.widget.NestedScrollView
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_article_body"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <TextView
-            android:id="@+id/article_body"
-            style="?android:attr/textAppearanceMedium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/detail_inner_horiz_margin"
-            android:layout_marginRight="@dimen/detail_inner_horiz_margin"
-            android:paddingBottom="@dimen/detail_body_bottom_margin"
-            android:textColor="@color/ltgray"
-            android:textColorLink="@color/theme_accent"
-            android:textSize="@dimen/detail_body_text_size"
-            android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
-
-    </androidx.core.widget.NestedScrollView>
-
-    <ImageButton android:id="@+id/share_fab"
-        android:stateListAnimator="@anim/fab_state_list_anim"
-        android:background="@drawable/add_fab_background"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:src="@drawable/ic_share"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/share_fab"
         android:elevation="@dimen/fab_elevation"
-        android:contentDescription="@string/action_share" />
+        android:backgroundTint="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/ctb_detail"
+        app:layout_anchorGravity="bottom|end"
+        android:src="@drawable/ic_share"
+        android:stateListAnimator="@anim/fab_state_list_anim" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

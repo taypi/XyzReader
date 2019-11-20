@@ -8,11 +8,12 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -40,7 +41,6 @@ public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ArticleListActivity.class.toString();
-    private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
 
@@ -54,13 +54,6 @@ public class ArticleListActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_list);
-
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-
-
-        final View toolbarContainerView = findViewById(R.id.toolbar_container);
-
-        mSwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
 
         mRecyclerView = findViewById(R.id.recycler_view);
         getLoaderManager().initLoader(0, null, this);
@@ -100,6 +93,9 @@ public class ArticleListActivity extends AppCompatActivity implements
     };
 
     private void updateRefreshingUI() {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
     }
 
@@ -113,10 +109,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         Adapter adapter = new Adapter(cursor);
         adapter.setHasStableIds(true);
         mRecyclerView.setAdapter(adapter);
-        int columnCount = getResources().getInteger(R.integer.list_column_count);
-        StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(sglm);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
     }
 
     @Override

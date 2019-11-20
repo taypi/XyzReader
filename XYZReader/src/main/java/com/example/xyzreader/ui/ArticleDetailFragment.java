@@ -7,8 +7,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 
 import java.text.ParseException;
@@ -17,8 +15,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.os.Bundle;
+
 import androidx.core.app.ShareCompat;
 import androidx.palette.graphics.Palette;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -27,12 +29,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
+import com.google.android.material.snackbar.Snackbar;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -55,6 +60,9 @@ public class ArticleDetailFragment extends Fragment implements
     private int mTopInset;
     private View mPhotoContainerView;
     private ImageView mPhotoView;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private ArticleBodyAdapter mAdapter;
     private int mScrollY;
     private boolean mIsCard = false;
     private int mStatusBarFullOpacityBottom;
@@ -111,11 +119,17 @@ public class ArticleDetailFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
-        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
+        mPhotoContainerView = null;
+
+        mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.rv_article_body);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ArticleBodyAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
         mStatusBarColorDrawable = new ColorDrawable(0);
 
@@ -178,19 +192,17 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+        TextView titleView = mRootView.findViewById(R.id.article_title);
+        TextView bylineView = mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-
-
-        bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+        mLayoutManager = new LinearLayoutManager(getActivity());
 
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+            mAdapter.setData(mCursor.getString(ArticleLoader.Query.BODY).split("\\\\s{4}"));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 bylineView.setText(Html.fromHtml(
@@ -206,11 +218,11 @@ public class ArticleDetailFragment extends Fragment implements
                 // If date is before 1902, just show the string
                 bylineView.setText(Html.fromHtml(
                         outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-                        + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
                                 + "</font>"));
 
             }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
@@ -220,8 +232,6 @@ public class ArticleDetailFragment extends Fragment implements
                                 Palette p = Palette.generate(bitmap, 12);
                                 mMutedColor = p.getDarkMutedColor(0xFF333333);
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mMutedColor);
                                 updateStatusBar();
                             }
                         }
@@ -231,12 +241,12 @@ public class ArticleDetailFragment extends Fragment implements
 
                         }
                     });
-        } else {
-            mRootView.setVisibility(View.GONE);
-            titleView.setText("N/A");
-            bylineView.setText("N/A" );
-            bodyView.setText("N/A");
         }
+//        else {
+//            mRootView.setVisibility(View.GONE);
+//            titleView.setText("N/A");
+//            bylineView.setText("N/A" );
+//        }
     }
 
     @Override
@@ -255,9 +265,11 @@ public class ArticleDetailFragment extends Fragment implements
 
         mCursor = cursor;
         if (mCursor != null && !mCursor.moveToFirst()) {
-            Log.e(TAG, "Error reading item detail cursor");
+            Log.e(TAG, getString(R.string.error));
+            Toast.makeText(getActivity(), getString(R.string.error), Toast.LENGTH_LONG).show();
             mCursor.close();
             mCursor = null;
+//            startActivity(new Intent(getActivity(), ArticleListActivity.class));
         }
 
         bindViews();
