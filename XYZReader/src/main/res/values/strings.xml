@@ -10,5 +10,6 @@
     <string name="up">Up</string>
 
     <string name="error">Error reading item detail</string>
+    <string name="network_error">Error connecting to the internet</string>
 
 </resources>

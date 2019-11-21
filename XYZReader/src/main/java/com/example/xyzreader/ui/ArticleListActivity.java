@@ -1,7 +1,10 @@
 package com.example.xyzreader.ui;
 
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,9 +62,31 @@ public class ArticleListActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(mConnectionFailureReceiver, new IntentFilter(UpdaterService.CONNECTION_FAILURE));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mConnectionFailureReceiver);
+    }
+
     private void refresh() {
         startService(new Intent(this, UpdaterService.class));
     }
+
+    private BroadcastReceiver mConnectionFailureReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (UpdaterService.CONNECTION_FAILURE.equals(intent.getAction())) {
+                Snackbar.make(findViewById(R.id.list_container),
+                        getString(R.string.network_error), Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
