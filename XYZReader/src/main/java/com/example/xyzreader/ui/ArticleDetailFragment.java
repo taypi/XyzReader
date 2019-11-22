@@ -202,7 +202,7 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            mAdapter.setData(mCursor.getString(ArticleLoader.Query.BODY).split("\\\\s{4}"));
+            mAdapter.setData(mCursor.getString(ArticleLoader.Query.BODY).split("\r\n\r\n"));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 bylineView.setText(Html.fromHtml(
